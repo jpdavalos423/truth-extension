@@ -3,13 +3,21 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>My Extension</title>
+    <title>Truth Verifier</title>
+    <link rel="stylesheet" href="popup.css">
 </head>
 <body>
-    <form>
-        <input type="text" id="text-input">
-        <button id="enter-button">Enter</button>
-    </form>
+    <div class="container">
+        <div class="header">
+            <h1>Truth Verifier</h1>
+        </div>
+        <div class="input-container">
+            <textarea id="text-input" placeholder="Paste or type text to verify..."></textarea>
+            <button id="verify-button">Verify Truth</button>
+        </div>
+        <div class="loading" id="loading">Verifying...</div>
+        <div class="response-container" id="response"></div>
+    </div>
     <script src="popup.js"></script>
 </body>
 </html>
