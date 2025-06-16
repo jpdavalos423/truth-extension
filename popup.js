@@ -1,39 +1,45 @@
-document.addEventListener('DOMContentLoaded', function() {
-    const textInput = document.getElementById('text-input');
-    const verifyButton = document.getElementById('verify-button');
-    const loadingElement = document.getElementById('loading');
-    const responseElement = document.getElementById('response');
+// Load selection into textarea on popup open & handle verify click
 
-    // Handle verify button click
-    verifyButton.addEventListener('click', async function() {
-        const text = textInput.value.trim();
-        
-        if (!text) {
-            return;
-        }
+// Wait for DOM
+document.addEventListener("DOMContentLoaded", () => {
+  console.log("🔍 popup.js loaded");
+  const textarea = document.getElementById("text-input");
+  const verifyButton = document.getElementById("verify-button");
+  const loading = document.getElementById("loading");
+  const response = document.getElementById("response");
 
-        // Show loading state
-        loadingElement.style.display = 'block';
-        verifyButton.disabled = true;
-        responseElement.style.display = 'none';
-
-        try {
-            // TODO: Implement OpenAI API call here
-            // For now, just simulate a response
-            await new Promise(resolve => setTimeout(resolve, 1000));
-            responseElement.textContent = 'This is a placeholder response. OpenAI API integration coming soon!';
-            responseElement.style.display = 'block';
-        } catch (error) {
-            responseElement.textContent = 'An error occurred. Please try again.';
-            responseElement.style.display = 'block';
-        } finally {
-            loadingElement.style.display = 'none';
-            verifyButton.disabled = false;
-        }
+  // Fetch selected text
+  chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
+    const tab = tabs[0];
+    if (!tab?.id) return;
+    chrome.tabs.sendMessage(tab.id, { type: "GET_SELECTION" }, (res) => {
+      if (!chrome.runtime.lastError && res?.text) {
+        textarea.value = res.text;
+        verifyButton.disabled = !res.text.trim();
+      }
     });
+  });
 
-    // Handle text input changes
-    textInput.addEventListener('input', function() {
-        verifyButton.disabled = !textInput.value.trim();
-    });
+  // Enable verify when textarea not empty
+  textarea.addEventListener("input", () => {
+    verifyButton.disabled = !textarea.value.trim();
+  });
+
+  // Sample output on click
+  verifyButton.addEventListener("click", async () => {
+    loading.style.display = "block";
+    response.style.display = "none";
+    verifyButton.disabled = true;
+
+    // Simulate API call
+    await new Promise((r) => setTimeout(r, 1000));
+
+    // Sample truth check result
+    response.textContent = textarea.value.includes("moon landing")
+      ? "✅ The statement appears TRUE based on historical consensus."
+      : "❓ Unable to verify definitively—please refine your query.";
+    response.style.display = "block";
+    loading.style.display = "none";
+    verifyButton.disabled = false;
+  });
 });
